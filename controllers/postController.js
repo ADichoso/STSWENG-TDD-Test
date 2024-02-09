@@ -51,3 +51,5 @@ exports.getPost = (req, res) => {
     res.render('singlepost', { pageTitle: post.title, post: post.toObject()});
   });
 }
+
+

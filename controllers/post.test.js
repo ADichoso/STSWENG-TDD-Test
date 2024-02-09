@@ -100,15 +100,15 @@ describe('Post controller', () => {
 
         it('returns the updated post object', () => {
             // Arrange
-            expectedResult1 = {
-                id: '507blahhh',
+            expectedResult = {
+                _id: '507asdghajsdhjgasd',
                 title: 'My first test post',
                 content: 'Random content',
                 author: 'stswenguser',
                 date: Date.now()
             };
 
-            updatePostStub = sinon.stub(PostModel, 'create').yields(null, expectedResult1);
+            createPostStub = sinon.stub(PostModel, 'create').yields(null, expectedResult);
 
             // Act
             PostController.addPost(req, res);
@@ -120,12 +120,6 @@ describe('Post controller', () => {
             sinon.assert.calledWith(res.json, sinon.match({ author: req.body.author }));
 
 
-            updatePostStub.restore();
-            res = {
-                json: sinon.spy(),
-                status: sinon.stub().returns({ end: sinon.spy() })
-            };
-            
             // Arrange
             expectedResult2 = {
                 id: '507blahhh',
@@ -140,6 +134,7 @@ describe('Post controller', () => {
 
             // Assert
             sinon.assert.calledWith(PostModel.update, req2.body)
+            sinon.assert.calledWith(res.json, sinon.match({ id: req2.body.id }));
             sinon.assert.calledWith(res.json, sinon.match({ title: req2.body.title }));
             sinon.assert.calledWith(res.json, sinon.match({ content: req2.body.content }));
         });
@@ -157,8 +152,4 @@ describe('Post controller', () => {
             sinon.assert.calledOnce(res.status(500).end);
         });
     });
-
-    describe('findPost', () => {
-
-    })
 });

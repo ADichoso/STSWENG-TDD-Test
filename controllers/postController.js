@@ -1,33 +1,111 @@
 const postModel = require('../models/post');
+const userModel = require('../models/post');
+
 const { validationResult } = require('express-validator');
 
 exports.addPost = (req, res) => {
-  const errors = validationResult(req);
-
-  if (errors.isEmpty()) {
     const {
-      title,
-      content
-    } = req.body;
+        author,
+        title,
+        content
+        } = req.body;
 
-    const author = req.session.user;
-
-    postModel.create({ title, content, author}, (err, post) => {
-      if (err) {
-        req.flash('error_msg', 'Could not create post. Please try again.');
-        res.redirect('/posts/add');
-      } else {
-        res.redirect('/posts');
-      }
-    });
-  } else {
-    const messages = errors.array().map((item) => item.msg);
-
-    req.flash('error_msg', messages.join(' '));
-    res.redirect('/posts/add');
-  }
-
+        postModel.create({ title, content, author}, (err, post) => {
+        if (err) {
+            return res.status(500).end();
+        } else {
+            return res.json(post);
+        }
+        });
 };
+
+exports.updatePost = (req, res) => {
+    const errors = validationResult(req);
+
+
+    console.log("UPDATING POST");
+    if (errors.isEmpty()) {
+        const {
+        id,
+        title,
+        content
+        } = req.body;
+
+        postModel.update({id: id, title: title, content: content}, (err, post) => 
+        {
+            if (err) {
+                return res.status(500).end();
+            } else {
+                return res.json(post);
+            }
+        });
+
+    } else {
+        res.redirect('/');
+    }
+};
+
+exports.showUpdatePostPage = (req, res) => 
+{
+    //Get id of post
+    const id = req.params.id;
+
+    console.log("ID:" + id)
+
+    const username = req.session.name
+
+    postModel.getById(id, (err, post) => 
+    {
+        console.log(post)
+        if (err) 
+        {
+            req.flash('error_msg', 'Could not update post. Please try again.');
+            res.redirect('/');
+        } 
+        else 
+        {
+            if(post.author.name == username)
+            {
+                res.render('editPost', 
+                {
+                    pageTitle: post.title,
+                    method: "Update",
+                    post: post.toObject(),
+                });
+            }
+        }
+    });
+}
+
+exports.showDeletePostPage = (req, res) => 
+{
+    //Get id of post
+    const id = req.params.id;
+
+    const username = req.session.name
+
+    postModel.getById(id, (err, post) => 
+    {
+        if (err) 
+        {
+            req.flash('error_msg', 'Could not delete post. Please try again.');
+            res.redirect('/');
+        } 
+        else 
+        {
+            if(post.author.name == username)
+            {
+                res.render('editPost', 
+                {
+                    pageTitle: post.title,
+                    method: "Delete",
+                    post: post.toObject(),
+                });
+            }
+        }
+    });
+}
+
 
 exports.getUserPosts = (user, callback) => {
   postModel.getByUser(user, (err, posts) => {
@@ -51,24 +129,3 @@ exports.getPost = (req, res) => {
     res.render('singlepost', { pageTitle: post.title, post: post.toObject()});
   });
 }
-
-exports.deletePost = (req, res) => {
-  const errors = validationResult(req);
-
-  console.log("DELETING POST");
-  if (errors.isEmpty()) {
-      const {
-      id
-      } = req.body;
-
-      postModel.delete(id, (err, post) =>
-      {
-          if (err) {
-              return res.status(500).end();
-          } else {
-              return res.json(post);
-          }
-      });
-  } else {
-  }
-};

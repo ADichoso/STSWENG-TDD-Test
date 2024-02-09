@@ -19,6 +19,8 @@ const postsRouter = require('./routes/postRoutes');
 const app = express();
 const port = 9090;
 
+
+
 // Listening to the port provided
 app.listen(port, () => {
   console.log('App listening at port ' + port)
@@ -41,6 +43,10 @@ app.engine('hbs', exphbs({
     dateFormat: function(context, block) {
       var f = block.hash.format || "MMMM DD YYYY, h:mm a";
       return moment(new Date(context), "YYYY-MM-DDTHH:mm:ss.SSSZ").format(f);
+    },
+
+    ifEquals: function(arg1, arg2, options) {
+        return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
     }
   }
 }));

@@ -19,8 +19,23 @@ exports.create = (obj, next) => {
   });
 };
 
+exports.update = (obj) => {
+    const post = Post.findById(obj.id).update({title: obj.title, content: obj.content}).exec((err, post) => 
+    {
+        next(err, post);
+    });
+};
+
+exports.delete = (id) => {
+    Post.deleteOne({_id: id}).exec((err, post) => 
+    {
+        next(err, post);
+    });
+};
+
+
 // Retrieving a post based on ID
-exports.getById = function(id, next) {
+exports.getById = (id, next) => {
   Post.findById(id).populate('author', 'name').exec((err, post) => {
     next(err, post);
   });

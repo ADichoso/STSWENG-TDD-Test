@@ -12,12 +12,17 @@ router.get('/', isPrivate, (req, res) => {
 });
 
 router.get('/add', isPrivate, postValidation, (req, res) => {
-  res.render('newpost', { pageTitle: 'New Post' });
+  res.render('newpost', { pageTitle: 'New Post', author: req.session.user});
 });
+
+router.get('/update/:id', isPrivate, postController.showUpdatePostPage);
+router.get('/delete/:id', isPrivate, postController.showDeletePostPage);
 
 router.get('/:id', isPrivate, postController.getPost);
 
 
 router.post('/add', postController.addPost);
+router.post('/Update', postController.updatePost);
+router.post('/Delete', postController.deletePost);
 
 module.exports = router;

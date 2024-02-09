@@ -8,7 +8,7 @@ git push origin main
 == 3:50PM Miguel G. ==
 git init
 git add .
-git commit -am "Modified Project Files"
+git commit -am "Update test"
 git remote add origin https://github.com/AaronRdm/STSWENG-TDD-Test
 git push origin main
 
@@ -19,3 +19,9 @@ git stash pop
 git add .
 git commit -am "Added Failing Test for next Delete Module Functionality"
 git push origin master
+
+== 9:30PM Miguel G. ==
+git init
+git add .
+git commit -am "Delete post"
+git push origin main

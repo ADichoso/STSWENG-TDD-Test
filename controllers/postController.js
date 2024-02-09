@@ -129,3 +129,24 @@ exports.getPost = (req, res) => {
     res.render('singlepost', { pageTitle: post.title, post: post.toObject()});
   });
 }
+
+exports.deletePost = (req, res) => {
+  const errors = validationResult(req);
+
+  console.log("DELETING POST");
+  if (errors.isEmpty()) {
+      const {
+      id
+      } = req.body;
+
+      postModel.delete(id, (err, post) =>
+      {
+          if (err) {
+              return res.status(500).end();
+          } else {
+              return res.json(post);
+          }
+      });
+  } else {
+  }
+};

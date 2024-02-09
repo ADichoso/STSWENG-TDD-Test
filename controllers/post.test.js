@@ -1,8 +1,6 @@
-//import { addPost } from "./postController";
-//import { jest } from "@jest/globals";
 const sinon = require('sinon');
-const PostModel = require('../models/post');
-const PostController = require('../controllers/postController');
+const PostModel = require('../models/post.js');
+const PostController = require('../controllers/postController.js');
 
 describe('Post controller', () => {
     // Setup the responses
@@ -20,12 +18,69 @@ describe('Post controller', () => {
 
     let expectedResult;
 
+    
+    describe('create', () => {
+        var createPostStub;
+
+        beforeEach(() => {
+            // before every test case setup first
+            res = {
+                json: sinon.spy(),
+                status: sinon.stub().returns({ end: sinon.spy() })
+            };
+        });
+
+        afterEach(() => {
+            // executed after the test case
+            createPostStub.restore();
+        });
+
+
+        it('should return the created post object', () => {
+            // Arrange
+            expectedResult = {
+                _id: '507asdghajsdhjgasd',
+                title: 'My first test post',
+                content: 'Random content',
+                author: 'stswenguser',
+                date: Date.now()
+            };
+
+            createPostStub = sinon.stub(PostModel, 'create').yields(null, expectedResult);
+
+            // Act
+            PostController.addPost(req, res);
+
+            // Assert
+            sinon.assert.calledWith(PostModel.create, req.body);
+            sinon.assert.calledWith(res.json, sinon.match({ title: req.body.title }));
+            sinon.assert.calledWith(res.json, sinon.match({ content: req.body.content }));
+            sinon.assert.calledWith(res.json, sinon.match({ author: req.body.author }));
+
+        });
+
+
+        // Error Scenario
+        it('should return status 500 on server error', () => {
+            // Arrange
+            createPostStub = sinon.stub(PostModel, 'create').yields(error);
+
+            // Act
+            PostController.addPost(req, res);
+
+            // Assert
+            sinon.assert.calledWith(PostModel.create, req.body);
+            sinon.assert.calledWith(res.status, 500);
+            sinon.assert.calledOnce(res.status(500).end);
+        });
+    });
+
     describe('update', () => {
         let req2 = {
             body: {
-                author: 'stswenguserUPDATED',
-                title: 'My first UPDATED test post',
-                content: 'Random content UPDATED'
+                id: '507blahhh',
+                title: 'My first test post UPDATED WITH NEW VALUES',
+                content: 'Random content UPDATED WITH NEW VALUES'
             }
         };
         var updatePostStub;
@@ -45,37 +100,65 @@ describe('Post controller', () => {
 
         it('returns the updated post object', () => {
             // Arrange
-            expectedResult = {
-                _id: '507blahhh', // place valid post if
-                title: 'my first updated test',
-                content: 'random content updated',
-                author: 'stswenguserUPDATED',
+            expectedResult1 = {
+                id: '507blahhh',
+                title: 'My first test post',
+                content: 'Random content',
+                author: 'stswenguser',
                 date: Date.now()
             };
 
-            updatePostStub = sinon.stub(PostModel, 'updatePost').yields(null, expectedResult);
+            updatePostStub = sinon.stub(PostModel, 'create').yields(null, expectedResult1);
 
             // Act
-            PostController.update(req2, res);
+            PostController.addPost(req, res);
 
             // Assert
-            sinon.assert.calledWith(PostModel.updatePost, req2.body)
+            sinon.assert.calledWith(PostModel.create, req.body);
+            sinon.assert.calledWith(res.json, sinon.match({ title: req.body.title }));
+            sinon.assert.calledWith(res.json, sinon.match({ content: req.body.content }));
+            sinon.assert.calledWith(res.json, sinon.match({ author: req.body.author }));
+
+
+            updatePostStub.restore();
+            res = {
+                json: sinon.spy(),
+                status: sinon.stub().returns({ end: sinon.spy() })
+            };
+            
+            // Arrange
+            expectedResult2 = {
+                id: '507blahhh',
+                title: 'My first test post UPDATED WITH NEW VALUES',
+                content: 'Random content UPDATED WITH NEW VALUES',
+            };
+
+            updatePostStub = sinon.stub(PostModel, 'update').yields(null, expectedResult2);
+
+            // Act
+            PostController.updatePost(req2, res);
+
+            // Assert
+            sinon.assert.calledWith(PostModel.update, req2.body)
             sinon.assert.calledWith(res.json, sinon.match({ title: req2.body.title }));
             sinon.assert.calledWith(res.json, sinon.match({ content: req2.body.content }));
-            sinon.assert.calledWith(res.json, sinon.match({ author: req2.body.author }));
         });
 
         // Error Scenario
         it('returns status 500 on server error', () => {
-            updatePostStub = sinon.stub(PostModel, 'updatePost').yields(error);
+            updatePostStub = sinon.stub(PostModel, 'update').yields(error);
 
             // Act
-            PostController.update(req2, res);
+            PostController.updatePost(req2, res);
 
             // Assert
-            sinon.assert.calledWith(PostModel.updatePost, req2.body);
+            sinon.assert.calledWith(PostModel.update, req2.body);
             sinon.assert.calledWith(res.status, 500);
             sinon.assert.calledOnce(res.status(500).end);
         });
     });
+
+    describe('findPost', () => {
+
+    })
 });

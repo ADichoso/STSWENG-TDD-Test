@@ -1,0 +1,6 @@
+== 3:50PM Miguel G. ==
+git init
+git add .
+git commit -am "Modified Project Files"
+git remote add origin https://github.com/AaronRdm/STSWENG-TDD-Test
+git push origin main
